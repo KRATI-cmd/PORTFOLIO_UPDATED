@@ -436,7 +436,7 @@ export default function Portfolio() {
 
       <footer className="relative z-10 border-t border-white/10 px-5 py-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-mist sm:flex-row">
-          <p>Copyright {new Date().getFullYear()} Krati Joshi. Built in dark mode.</p>
+          <p>Copyright {new Date().getFullYear()} Krati Joshi</p>
           <div className="flex gap-3">
             <a className="transition hover:text-emerald-300" href="https://github.com/KRATI-cmd" target="_blank" rel="noreferrer">GitHub</a>
             <a className="transition hover:text-cyan-300" href="https://www.linkedin.com/in/krati-joshi-9b000a20b/" target="_blank" rel="noreferrer">LinkedIn</a>
