@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,10 +14,44 @@ const jetBrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const description =
+  "Portfolio of Krati Joshi, a backend engineer building secure, fast APIs and event-driven systems with Node.js, TypeScript, PostgreSQL, and Kafka.";
+
 export const metadata: Metadata = {
-  title: "Krati Joshi | Backend Engineer",
-  description:
-    "Dark-mode developer portfolio for Krati Joshi, Backend Engineer specializing in Node.js, TypeScript, PostgreSQL, and event-driven microservices.",
+  title: {
+    default: "Krati Joshi | Backend Engineer",
+    template: "%s | Krati Joshi",
+  },
+  description,
+  keywords: [
+    "Krati Joshi",
+    "Backend Engineer",
+    "Node.js",
+    "TypeScript",
+    "PostgreSQL",
+    "Kafka",
+    "Microservices",
+    "REST APIs",
+  ],
+  authors: [{ name: "Krati Joshi" }],
+  creator: "Krati Joshi",
+  openGraph: {
+    type: "website",
+    title: "Krati Joshi | Backend Engineer",
+    description,
+    siteName: "Krati Joshi",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Krati Joshi | Backend Engineer",
+    description,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#060B14",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

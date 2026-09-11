@@ -2,9 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------
+   Design tokens — "Deep Ocean"
+   Every surface reads from --accent-* so a card only has to declare
+   which accent it belongs to (data-accent), not restate six classes.
+---------------------------------------------------------------- */
 :root {
   color-scheme: dark;
-  background: #090d16;
+
+  --bg: #060b14;
+  --bg-raised: #0e1626;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --hairline: rgba(148, 163, 184, 0.14);
+
+  --accent: 56 189 248; /* sky */
+  --accent-soft: rgba(56, 189, 248, 0.12);
+
+  --radius-card: 1.5rem;
+  --radius-pill: 999px;
+
+  background: var(--bg);
+}
+
+[data-accent="sky"] {
+  --accent: 56 189 248;
+  --accent-soft: rgba(56, 189, 248, 0.12);
+}
+
+[data-accent="cyan"] {
+  --accent: 34 211 238;
+  --accent-soft: rgba(34, 211, 238, 0.12);
+}
+
+[data-accent="teal"] {
+  --accent: 45 212 191;
+  --accent-soft: rgba(45, 212, 191, 0.12);
 }
 
 * {
@@ -13,57 +46,279 @@
 
 html {
   scroll-behavior: smooth;
+  /* keep anchored sections clear of the fixed header */
+  scroll-padding-top: 6rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   min-height: 100vh;
   overflow-x: hidden;
-  background:
-    radial-gradient(circle at top left, rgba(16, 185, 129, 0.12), transparent 34rem),
-    radial-gradient(circle at 85% 12%, rgba(6, 182, 212, 0.12), transparent 30rem),
-    radial-gradient(circle at 50% 100%, rgba(139, 92, 246, 0.1), transparent 34rem),
-    #090d16;
-  color: #f9fafb;
+  background: var(--bg);
+  color: var(--text);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: rgba(16, 185, 129, 0.35);
+  background: rgba(56, 189, 248, 0.32);
   color: #ffffff;
 }
 
 :focus-visible {
-  outline: 2px solid #10b981;
-  outline-offset: 4px;
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
+/* Scrollbar — matches the surface rather than the OS default */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #05090f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border: 2px solid #05090f;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* ---------------------------------------------------------------
+   Keyframes used by the hand-written classes below.
+   These live here rather than in tailwind.config because Tailwind only
+   emits a @keyframes block when a matching animate-* utility appears in
+   the markup -- these are driven by .marquee-track / .text-gradient /
+   .sheen instead, so Tailwind would strip them.
+---------------------------------------------------------------- */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes gradient-pan {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes sheen-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Backdrops
+---------------------------------------------------------------- */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 42px 42px;
+    linear-gradient(rgba(148, 197, 248, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 197, 248, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  /* fade the grid out toward the edges so it reads as depth, not wallpaper */
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 35%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 35%, transparent 78%);
 }
 
-.bg-dots {
-  background-image: radial-gradient(rgba(156, 163, 175, 0.28) 1px, transparent 1px);
-  background-size: 20px 20px;
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
 }
 
-.glass-card {
-  border: 1px solid rgba(31, 41, 55, 0.95);
-  background: linear-gradient(145deg, rgba(17, 24, 39, 0.78), rgba(9, 13, 22, 0.56));
-  backdrop-filter: blur(18px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+/* Drifting colour fields behind everything */
+.aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
 }
 
+/* ---------------------------------------------------------------
+   Surfaces
+---------------------------------------------------------------- */
+.card {
+  position: relative;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: linear-gradient(160deg, rgba(20, 33, 54, 0.74), rgba(7, 12, 21, 0.64));
+  backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 40px -28px rgba(0, 0, 0, 0.9);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+/* Hairline that lights up in the card's own accent on hover */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    130deg,
+    rgb(var(--accent) / 0.5),
+    transparent 40%,
+    transparent 60%,
+    rgb(var(--accent) / 0.22)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.card:hover::before,
+.card:focus-within::before {
+  opacity: 1;
+}
+
+.card-interactive:hover {
+  border-color: rgb(var(--accent) / 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgb(var(--accent) / 0.16),
+    0 26px 55px -30px rgb(var(--accent) / 0.55);
+}
+
+/* Lift is separate from tilt: the tilt wrapper owns the parent transform,
+   so the card itself is free to translate on hover without fighting it. */
+.card-lift:hover {
+  transform: translateY(-6px);
+}
+
+/* ---------------------------------------------------------------
+   Type
+---------------------------------------------------------------- */
 .text-gradient {
-  background: linear-gradient(90deg, #f9fafb, #7dd3fc 45%, #34d399);
+  background: linear-gradient(100deg, #f1f5f9 0%, #38bdf8 38%, #2dd4bf 62%, #f1f5f9 100%);
+  background-size: 250% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  animation: gradient-pan 9s ease-in-out infinite;
 }
 
-.neon-border {
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.42), 0 0 22px rgba(16, 185, 129, 0.18);
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: rgb(var(--accent));
+}
+
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(var(--accent)));
+}
+
+/* Balance short headings across lines instead of leaving orphans */
+.balance {
+  text-wrap: balance;
+}
+
+.pretty {
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------
+   Bits
+---------------------------------------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgb(var(--accent) / 0.24);
+  background: var(--accent-soft);
+  color: rgb(var(--accent));
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 0.75rem;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+}
+
+.chip:hover {
+  border-color: rgb(var(--accent) / 0.55);
+  transform: translateY(-2px);
+}
+
+.chip-neutral {
+  border-color: var(--hairline);
+  background: rgba(148, 163, 184, 0.06);
+  color: #cbd5e1;
+}
+
+/* Light sweeping across a filled button on hover */
+.sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: translateX(-120%) skewX(-18deg);
+  pointer-events: none;
+}
+
+.sheen:hover::after {
+  animation: sheen-sweep 0.85s ease-out;
+}
+
+/* Horizontal auto-scrolling strip; the track holds two copies of the
+   content and shifts by exactly -50% so the loop is seamless. */
+.marquee {
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -72,5 +327,15 @@ body {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* An infinite marquee frozen at 0.01ms would still sit mid-scroll;
+     park it at the start and let it scroll manually instead. */
+  .marquee-track {
+    animation: none !important;
+  }
+
+  .marquee {
+    overflow-x: auto;
   }
 }
