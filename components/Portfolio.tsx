@@ -32,6 +32,12 @@ import {
   WhatsApp,
 } from "./icons";
 import { CountUp, EASE, Magnetic, Marquee, Tilt, Typewriter, WordReveal } from "./motion";
+import dynamic from "next/dynamic";
+
+// Dynamic imports for Three.js components (client-side only)
+const ThreeScene = dynamic(() => import("./ThreeScene"), { ssr: false });
+const FloatingCube = dynamic(() => import("./FloatingCube"), { ssr: false });
+const SkillOrb = dynamic(() => import("./SkillOrb"), { ssr: false });
 
 type Accent = "sky" | "cyan" | "teal";
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
@@ -260,6 +266,7 @@ export default function Portfolio() {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [curlDone, setCurlDone] = useState(false);
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
 
   const { scrollYProgress, scrollY } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, restDelta: 0.001 });
@@ -314,6 +321,9 @@ export default function Portfolio() {
         pointerY.set(event.clientY);
       }}
     >
+      {/* Three.js 3D Scene */}
+      <ThreeScene />
+
       {/* Drifting aurora fields */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div
@@ -816,6 +826,11 @@ export default function Portfolio() {
                     </span>
                   </div>
 
+                  {/* 3D Floating Cube Preview */}
+                  <div className="my-6 -mx-4 sm:-mx-6">
+                    <FloatingCube accent={project.accent} />
+                  </div>
+
                   <h3 className="mt-4 text-2xl font-extrabold tracking-tight text-white sm:text-[1.75rem]">
                     {project.name}
                   </h3>
@@ -878,13 +893,43 @@ export default function Portfolio() {
           </p>
         </motion.div>
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-2">
+        {/* 3D Interactive Skills Visualization */}
+        <motion.div {...reveal(0.2)} className="card mt-12 overflow-hidden p-0">
+          <div className="p-6 sm:p-8 border-b border-white/10">
+            <h3 className="text-xl font-bold text-white flex items-center gap-3">
+              <Spark className="h-5 w-5 text-sky-400" />
+              Interactive 3D Skills Map
+            </h3>
+            <p className="mt-2 text-sm text-mist">Drag to rotate • Scroll to zoom • Auto-rotating visualization</p>
+          </div>
+          <SkillOrb
+            skills={[
+              "Node.js",
+              "TypeScript",
+              "PostgreSQL",
+              "Kafka",
+              "Express.js",
+              "Prisma",
+              "AWS S3",
+              "REST APIs",
+              "MongoDB",
+              "JWT Auth",
+              "RBAC",
+              "Microservices"
+            ]}
+            accent="sky"
+            selectedSkill={selectedSkill}
+            onSkillSelect={(skill) => setSelectedSkill(skill)}
+          />
+        </motion.div>
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-2">
           {skillGroups.map((group, index) => {
             const GroupIcon = group.icon;
             return (
               <motion.div
                 key={group.title}
-                {...reveal(index * 0.06)}
+                {...reveal(index * 0.06 + 0.3)}
                 data-accent={group.accent}
                 className="card card-interactive card-lift p-6 sm:p-7"
               >
@@ -903,13 +948,24 @@ export default function Portfolio() {
                   className="mt-6 flex flex-wrap gap-2.5"
                 >
                   {group.items.map((item) => (
-                    <motion.span
+                    <motion.button
                       key={item}
                       variants={{ hidden: { opacity: 0, y: 8, scale: 0.92 }, visible: { opacity: 1, y: 0, scale: 1 } }}
-                      className="chip"
+                      onClick={() => setSelectedSkill(selectedSkill === item ? null : item)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
+                      animate={
+                        selectedSkill === item
+                          ? { scale: 1.12, boxShadow: `0 0 20px rgb(var(--accent) / 0.6)` }
+                          : { scale: 1, boxShadow: `0 0 0px rgb(var(--accent) / 0)` }
+                      }
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      className={`chip cursor-pointer transition-all duration-300 ${
+                        selectedSkill === item ? "ring-2 ring-[rgb(var(--accent))] bg-[rgb(var(--accent)/0.15)]" : ""
+                      }`}
                     >
                       {item}
-                    </motion.span>
+                    </motion.button>
                   ))}
                 </motion.div>
               </motion.div>

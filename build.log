@@ -1,0 +1,47 @@
+
+> krati-joshi-portfolio@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.15
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+Error: Cannot find module './379.js'
+Require stack:
+- D:\portfolio\.next\server\webpack-runtime.js
+- D:\portfolio\.next\server\app\icon.svg\route.js
+- D:\portfolio\node_modules\next\dist\server\require.js
+- D:\portfolio\node_modules\next\dist\server\load-components.js
+- D:\portfolio\node_modules\next\dist\build\utils.js
+- D:\portfolio\node_modules\next\dist\build\worker.js
+- D:\portfolio\node_modules\next\dist\compiled\jest-worker\processChild.js
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1430:15)
+    at D:\portfolio\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+    at Function._load (node:internal/modules/cjs/loader:1216:25)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1527:12)
+    at mod.require (D:\portfolio\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:147:16)
+    at __webpack_require__.f.require (D:\portfolio\.next\server\webpack-runtime.js:203:28) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'D:\\portfolio\\.next\\server\\webpack-runtime.js',
+    'D:\\portfolio\\.next\\server\\app\\icon.svg\\route.js',
+    'D:\\portfolio\\node_modules\\next\\dist\\server\\require.js',
+    'D:\\portfolio\\node_modules\\next\\dist\\server\\load-components.js',
+    'D:\\portfolio\\node_modules\\next\\dist\\build\\utils.js',
+    'D:\\portfolio\\node_modules\\next\\dist\\build\\worker.js',
+    'D:\\portfolio\\node_modules\\next\\dist\\compiled\\jest-worker\\processChild.js'
+  ]
+}
+
+> Build error occurred
+Error: Failed to collect page data for /icon.svg
+    at D:\portfolio\node_modules\next\dist\build\utils.js:1268:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  type: 'Error'
+}
