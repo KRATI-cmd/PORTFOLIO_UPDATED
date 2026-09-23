@@ -55,7 +55,14 @@ function SkillSphere({ skills, color, selectedSkill, onSkillClick }: { skills: s
             key={skill}
             position={[positions[index].x, positions[index].y, positions[index].z]}
             onClick={() => onSkillClick(skill)}
-            style={{ cursor: "pointer" } as any}
+            onPointerEnter={(e) => {
+              e.stopPropagation();
+              document.body.style.cursor = 'pointer';
+            }}
+            onPointerLeave={(e) => {
+              e.stopPropagation();
+              document.body.style.cursor = 'default';
+            }}
           >
             {/* Connection line from center */}
             <mesh>
