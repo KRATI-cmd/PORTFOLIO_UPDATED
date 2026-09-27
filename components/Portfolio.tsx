@@ -9,7 +9,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { useEffect, useState, type ComponentType, type SVGProps } from "react";
+import { useEffect, useRef, useState, type ComponentType, type SVGProps } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -262,11 +262,14 @@ function Section({
 
 export default function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [recruiterOpen, setRecruiterOpen] = useState(false);
   const [openExperience, setOpenExperience] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [curlDone, setCurlDone] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const recruiterTriggerRef = useRef<HTMLButtonElement>(null);
+  const recruiterCloseRef = useRef<HTMLButtonElement>(null);
 
   const { scrollYProgress, scrollY } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 28, restDelta: 0.001 });
@@ -307,11 +310,27 @@ export default function Portfolio() {
 
   // Lock background scrolling while the mobile sheet is open.
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.overflow = menuOpen || recruiterOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [menuOpen, recruiterOpen]);
+
+  useEffect(() => {
+    if (!recruiterOpen) return;
+
+    const trigger = recruiterTriggerRef.current;
+    recruiterCloseRef.current?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setRecruiterOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      trigger?.focus();
+    };
+  }, [recruiterOpen]);
 
   return (
     <main
@@ -500,6 +519,92 @@ export default function Portfolio() {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {recruiterOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setRecruiterOpen(false);
+            }}
+            className="fixed inset-0 z-[70] flex items-center justify-center overflow-y-auto bg-void/85 p-4 backdrop-blur-md sm:p-6"
+          >
+            <motion.section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="recruiter-title"
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.98 }}
+              transition={{ duration: 0.24, ease: EASE }}
+              className="card w-full max-w-2xl overflow-hidden rounded-2xl"
+            >
+              <div className="flex items-start justify-between gap-6 border-b border-white/10 px-6 py-5 sm:px-8">
+                <div>
+                  <Eyebrow accent="cyan">Recruiter Snapshot</Eyebrow>
+                  <h2 id="recruiter-title" className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+                    Krati Joshi
+                  </h2>
+                  <p className="mt-1 text-sm text-mist">Backend Developer · SAI Computers Limited</p>
+                </div>
+                <button
+                  ref={recruiterCloseRef}
+                  type="button"
+                  aria-label="Close recruiter snapshot"
+                  onClick={() => setRecruiterOpen(false)}
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 text-mist transition hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  <Close className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="grid gap-6 px-6 py-6 sm:grid-cols-[1fr_0.9fr] sm:px-8">
+                <div>
+                  <p className="text-sm font-semibold text-white">What I work on</p>
+                  <p className="pretty mt-2 text-sm leading-7 text-mist">
+                    Secure, production-focused backend systems across API design, database performance, access
+                    control, and event-driven processing.
+                  </p>
+                  <p className="mt-5 text-sm font-semibold text-white">Selected impact</p>
+                  <ul className="mt-3 space-y-3 text-sm text-mist">
+                    <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-sky-300" />120+ APIs shaped for production use</li>
+                    <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />Approx. 40% faster response paths</li>
+                    <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-teal-300" />Async image workloads handling 10k+ daily images</li>
+                  </ul>
+                </div>
+
+                <div className="border-t border-white/10 pt-5 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+                  <p className="text-sm font-semibold text-white">Relevant work</p>
+                  <p className="mt-3 text-sm font-semibold text-cyan-200">SMRITI 3.0</p>
+                  <p className="mt-1 text-sm leading-6 text-mist">Multi-tenant utility platform with role-based access and responsive analytics.</p>
+                  <p className="mt-4 text-sm font-semibold text-teal-200">Async OCR Pipeline</p>
+                  <p className="mt-1 text-sm leading-6 text-mist">Kafka-backed image processing with retries and failure handling.</p>
+                  <p className="mt-5 font-mono text-xs leading-6 text-slate-400">Node.js · TypeScript · PostgreSQL · Kafka · AWS</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 border-t border-white/10 bg-white/[0.02] px-6 py-5 sm:flex-row sm:px-8">
+                <a
+                  href={RESUME_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="sheen inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-sky-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-sky-300"
+                >
+                  <Document className="h-4 w-4" /> View Resume
+                </a>
+                <a
+                  href={`mailto:${EMAIL}`}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-cyan-400/35 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-400/10"
+                >
+                  <Mail className="h-4 w-4" /> Contact Krati
+                </a>
+              </div>
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ------------------------------------------------------------ HERO */}
       <section
         id="hero"
@@ -574,6 +679,15 @@ export default function Portfolio() {
                 Contact Me
               </a>
             </Magnetic>
+            <button
+              ref={recruiterTriggerRef}
+              type="button"
+              onClick={() => setRecruiterOpen(true)}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-6 py-3.5 font-semibold text-slate-200 transition hover:border-cyan-300/40 hover:bg-cyan-300/[0.08] hover:text-white sm:w-auto"
+            >
+              <Document className="h-4 w-4 text-cyan-200" />
+              30-sec Recruiter View
+            </button>
           </motion.div>
 
           <motion.div
