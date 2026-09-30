@@ -122,6 +122,9 @@ const projects: {
   story: string;
   highlights: string[];
   accent: Accent;
+  image?: string;
+  github?: string;
+  live?: string;
 }[] = [
   {
     name: "SMRITI 3.0",
@@ -136,20 +139,70 @@ const projects: {
       "Strengthened internal access control using granular role permissions across sensitive operational actions.",
     ],
     accent: "sky",
+    image: "/projects/smriti.png",
   },
   {
-    name: "Async OCR Pipeline",
-    subtitle: "An event-driven image processing workflow for high-volume field data.",
-    tag: "Pipeline",
-    tech: ["Node.js", "TypeScript", "Apache Kafka", "PostgreSQL", "AWS S3"],
+    name: "GIL Backend",
+    subtitle: "APMC portal services for the One Gujarat platform.",
+    tag: "Government Portal",
+    tech: ["Node.js", "Express.js", "Prisma", "MySQL", "JWT", "PDF & e-Sign"],
     story:
-      "Designed for messy, real-world uploads where reliability matters more than a perfect happy path. The system decouples ingestion, processing, retries, storage, and failure handling so the user-facing app stays fast.",
+      "A modular REST backend covering APMC and trader workflows, contract farming, online payments, e-signed documents and MIS dashboards, organised into route, controller and service layers per domain.",
     highlights: [
-      "Moved heavy OCR work out of request-response flows into asynchronous producer-consumer processing.",
-      "Added retry and dead-letter handling so failed images could be inspected without blocking the full pipeline.",
-      "Helped reduce repetitive manual entry by turning field images into structured operational data.",
+      "Split the API into domain modules (APMC, trader, payments, contract farming, eSign, MIS) behind role-based access.",
+      "Generated and digitally signed PDF documents and QR-verified certificates on the server.",
+      "Added validation, structured logging and file-upload handling for production support.",
     ],
     accent: "teal",
+    image: "/projects/gil.png",
+  },
+  {
+    name: "Snow Removal Canada",
+    subtitle: "A fast, animated marketing site for a 24/7 snow plowing service.",
+    tag: "Web App",
+    tech: ["React", "Vite", "Three.js", "Tailwind CSS"],
+    story:
+      "A conversion-focused landing page with an instant seasonal quote estimator, service tier comparison, before/after slider and a falling-snow hero, built to load quickly and work on mobile.",
+    highlights: [
+      "Built an interactive quote estimator and plan comparison to turn visitors into leads.",
+      "Added a snow-themed 3D hero, preloader and before/after slider without hurting page speed.",
+      "Responsive layout with clear emergency-dispatch call-to-actions.",
+    ],
+    accent: "cyan",
+    image: "/projects/snow-removal.png",
+    github: "https://github.com/KRATI-cmd/snow_removal",
+  },
+  {
+    name: "Ironwood Tree Removal",
+    subtitle: "A 24/7 emergency tree removal and storm cleanup landing page.",
+    tag: "Web App",
+    tech: ["React 19", "Vite", "Three.js", "Tailwind CSS v4"],
+    story:
+      "A storm-response site with a 3D storm hero, a height-based cost calculator with a live tree preview, a multi-step emergency request form and a scroll-driven story of how a job works.",
+    highlights: [
+      "Built a multi-step emergency request form with configurable lead-delivery endpoint.",
+      "Created a 3D tree preview that reacts to height, hazard and stump options in the calculator.",
+      "Respects reduced-motion and falls back gracefully when WebGL is unavailable.",
+    ],
+    accent: "sky",
+    image: "/projects/tree-removal.png",
+    github: "https://github.com/KRATI-cmd/Tree-removal",
+  },
+  {
+    name: "EpoxyGuard Pros",
+    subtitle: "A lead-generation site for epoxy flooring and basement waterproofing.",
+    tag: "Web App",
+    tech: ["React", "Vite", "TypeScript", "Tailwind CSS"],
+    story:
+      "A dark, high-contrast landing page with a three-step instant quote form, cost calculator, before/after gallery and reviews, designed to turn local search traffic into quote requests.",
+    highlights: [
+      "Built a multi-step quote form capturing service, area size and zip code.",
+      "Added a cost calculator and before/after showcase to build trust before the call.",
+      "Sticky call-to-action bar and responsive layout for mobile visitors.",
+    ],
+    accent: "teal",
+    image: "/projects/epoxy-flooring.png",
+    github: "https://github.com/KRATI-cmd/Epoxy-Flooring",
   },
 ];
 
@@ -911,23 +964,23 @@ export default function Portfolio() {
           <div className="max-w-3xl">
             <Eyebrow accent="cyan">Featured Projects</Eyebrow>
             <h2 className="balance mt-4 text-3xl font-bold leading-[1.12] tracking-[-0.025em] text-white sm:text-5xl">
-              Selected backend systems and architecture work.
+              Backend systems and web builds.
             </h2>
           </div>
           <p className="pretty max-w-md text-mist">
-            Rather than repeating resume bullets, these snapshots explain the product problem, backend approach, and
-            engineering choices behind the work.
+            Backend platforms from my day job plus two front-end builds from my own GitHub, each with the problem,
+            approach and engineering choices behind it.
           </p>
         </motion.div>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
           {projects.map((project, index) => (
-            <Tilt key={project.name} max={4} className="h-full">
+            <Tilt key={project.name} max={9} className="h-full">
               <motion.article
                 {...reveal(index * 0.08)}
                 whileHover={{ y: -8 }}
                 data-accent={project.accent}
-                className="card card-interactive group relative h-full overflow-hidden p-7 sm:p-8"
+                className="card card-interactive group relative h-full overflow-hidden p-5 sm:p-6 [transform-style:preserve-3d]"
               >
                 <div className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-[rgb(var(--accent)/0.16)] blur-3xl transition-opacity duration-500 group-hover:opacity-80" />
 
@@ -940,24 +993,38 @@ export default function Portfolio() {
                     </span>
                   </div>
 
-                  {/* 3D Floating Cube Preview */}
-                  <div className="my-6 -mx-4 sm:-mx-6">
-                    <FloatingCube accent={project.accent} />
-                  </div>
+                  {project.image ? (
+                    <div
+                      className="my-4 overflow-hidden rounded-xl border border-white/[0.08] bg-slate-900/60 shadow-[0_24px_50px_-18px_rgb(var(--accent)/0.55)] transition-transform duration-500 group-hover:[transform:translateZ(40px)_scale(1.02)]"
+                      style={{ transform: "translateZ(24px)" }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={project.image}
+                        alt={`${project.name} preview`}
+                        loading="lazy"
+                        className="aspect-[2/1] w-full object-cover object-top"
+                      />
+                    </div>
+                  ) : (
+                    <div className="my-6 -mx-4 sm:-mx-6">
+                      <FloatingCube accent={project.accent} />
+                    </div>
+                  )}
 
                   <h3 className="mt-4 text-2xl font-extrabold tracking-tight text-white sm:text-[1.75rem]">
                     {project.name}
                   </h3>
                   <p className="pretty mt-2 text-[rgb(var(--accent))]">{project.subtitle}</p>
 
-                  <p className="pretty mt-6 text-sm leading-7 text-slate-300">{project.story}</p>
+                  <p className="pretty mt-4 text-sm leading-6 text-slate-300">{project.story}</p>
 
                   <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     transition={{ staggerChildren: 0.04, delayChildren: 0.15 }}
-                    className="mt-6 flex flex-wrap gap-2"
+                    className="mt-4 flex flex-wrap gap-2"
                   >
                     {project.tech.map((tech) => (
                       <motion.span
@@ -970,8 +1037,8 @@ export default function Portfolio() {
                     ))}
                   </motion.div>
 
-                  <ul className="mt-7 space-y-4 border-t border-white/[0.07] pt-6 text-sm leading-7 text-mist">
-                    {project.highlights.map((highlight, hIndex) => (
+                  <ul className="mt-5 space-y-2.5 border-t border-white/[0.07] pt-4 text-sm leading-6 text-mist">
+                    {project.highlights.slice(0, 2).map((highlight, hIndex) => (
                       <motion.li
                         key={highlight}
                         initial={{ opacity: 0, x: -8 }}
@@ -987,6 +1054,23 @@ export default function Portfolio() {
                       </motion.li>
                     ))}
                   </ul>
+
+                  <div className="mt-5 flex flex-wrap gap-3 border-t border-white/[0.07] pt-4">
+                    {project.github ? (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="chip transition hover:brightness-125"
+                      >
+                        <Github className="h-3.5 w-3.5" />
+                        View on GitHub
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </a>
+                    ) : (
+                      <span className="chip chip-neutral">Private repository</span>
+                    )}
+                  </div>
                 </div>
               </motion.article>
             </Tilt>
